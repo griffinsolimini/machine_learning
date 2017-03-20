@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import os.path
 import pickle
 
@@ -12,7 +13,13 @@ val_Y = None
 test_X = None
 test_Y = None
 
+if not os.path.exists('pickle'):
+    os.makedirs('pickle')
+
 if os.path.isfile('pickle/training_X.pickle') and os.path.isfile('pickle/training_Y.pickle') and os.path.isfile('pickle/training_N.pickle'):
+    
+    print 'using saved training matrix'
+    
     with open('pickle/training_X.pickle') as f:
         training_X = pickle.load(f)
     with open('pickle/training_Y.pickle') as f:
@@ -22,8 +29,8 @@ if os.path.isfile('pickle/training_X.pickle') and os.path.isfile('pickle/trainin
 else:
     print "building training matrix..."
         
-    training_data = open('trainingData.txt', 'r')
-    training_labels = open('trainingLabels.txt', 'r')
+    training_data = open('data/trainingData.txt', 'r')
+    training_labels = open('data/trainingLabels.txt', 'r')
 
     training_X = None
     mat_str = '' 
@@ -53,6 +60,9 @@ else:
         pickle.dump(training_N, f)
 
 if os.path.isfile('pickle/val_X.pickle') and os.path.isfile('pickle/val_Y.pickle'):
+
+    print 'using saved validation matrix'
+
     with open('pickle/val_X.pickle') as f:
         val_X = pickle.load(f)
     with open('pickle/val_Y.pickle') as f:
@@ -60,8 +70,8 @@ if os.path.isfile('pickle/val_X.pickle') and os.path.isfile('pickle/val_Y.pickle
 else:
     print "building validation matrix..."
 
-    validation_data = open('validationData.txt', 'r')
-    validation_labels = open('validationLabels.txt', 'r')
+    validation_data = open('data/validationData.txt', 'r')
+    validation_labels = open('data/validationLabels.txt', 'r')
 
     val_X = None
     mat_str = '' 
@@ -87,6 +97,9 @@ else:
         pickle.dump(val_Y, f)
 
 if os.path.isfile('pickle/test_X.pickle') and os.path.isfile('pickle/test_Y.pickle'):
+
+    print 'using saved test matrix'
+
     with open('pickle/test_X.pickle') as f:
         test_X = pickle.load(f)
     with open('pickle/test_Y.pickle') as f:
@@ -94,8 +107,8 @@ if os.path.isfile('pickle/test_X.pickle') and os.path.isfile('pickle/test_Y.pick
 else:
     print "building test matrix..."
 
-    test_data = open('testData.txt', 'r')
-    test_labels = open('testLabels.txt', 'r')
+    test_data = open('data/testData.txt', 'r')
+    test_labels = open('data/testLabels.txt', 'r')
 
     test_X = None
     mat_str = '' 
