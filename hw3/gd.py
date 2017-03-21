@@ -9,9 +9,11 @@ training_N = 0
 
 val_X = None
 val_Y = None
+val_N = 0
 
 test_X = None
 test_Y = None
+test_N = 0
 
 if not os.path.exists('pickle'):
     os.makedirs('pickle')
@@ -36,7 +38,7 @@ else:
     mat_str = '' 
     for line in training_data:
         line = line.replace(',', ' ')
-        mat_str += str(line) + ';'
+        mat_str += '1.0 ' + str(line) + ';'
 
     mat_str = mat_str[0:len(mat_str)-1]
     training_X = np.matrix(mat_str)
@@ -59,7 +61,7 @@ else:
     with open('pickle/training_N.pickle', 'w') as f:
         pickle.dump(training_N, f)
 
-if os.path.isfile('pickle/val_X.pickle') and os.path.isfile('pickle/val_Y.pickle'):
+if os.path.isfile('pickle/val_X.pickle') and os.path.isfile('pickle/val_Y.pickle') and os.path.isfile('pickle/val_N.pickle'):
 
     print 'using saved validation matrix'
 
@@ -67,6 +69,8 @@ if os.path.isfile('pickle/val_X.pickle') and os.path.isfile('pickle/val_Y.pickle
         val_X = pickle.load(f)
     with open('pickle/val_Y.pickle') as f:
         val_Y = pickle.load(f)
+    with open('pickle/val_N.pickle') as f:
+        val_N = pickle.load(f)
 else:
     print "building validation matrix..."
 
@@ -77,14 +81,16 @@ else:
     mat_str = '' 
     for line in validation_data:
         line = line.replace(',', ' ')
-        mat_str += str(line) + ';'
+        mat_str += '1.0 ' + str(line) + ';'
 
     mat_str = mat_str[0:len(mat_str)-1]
     val_X = np.matrix(mat_str)
 
     val_Y = None
+    val_N = 0
     mat_str = ''
     for line in validation_labels:
+        val_N += 1
         line = line.replace(',', ' ')
         mat_str += str(line) + ';'
 
@@ -95,8 +101,10 @@ else:
         pickle.dump(val_X, f)
     with open('pickle/val_Y.pickle', 'w') as f:
         pickle.dump(val_Y, f)
+    with open('pickle/val_N.pickle', 'w') as f:
+        pickle.dump(val_N, f)
 
-if os.path.isfile('pickle/test_X.pickle') and os.path.isfile('pickle/test_Y.pickle'):
+if os.path.isfile('pickle/test_X.pickle') and os.path.isfile('pickle/test_Y.pickle') and os.path.isfile('pickle/test_N.pickle'):
 
     print 'using saved test matrix'
 
@@ -104,6 +112,8 @@ if os.path.isfile('pickle/test_X.pickle') and os.path.isfile('pickle/test_Y.pick
         test_X = pickle.load(f)
     with open('pickle/test_Y.pickle') as f:
         test_Y = pickle.load(f)
+    with open('pickle/test_N.pickle') as f:
+        test_N = pickle.load(f)
 else:
     print "building test matrix..."
 
@@ -114,14 +124,16 @@ else:
     mat_str = '' 
     for line in test_data:
         line = line.replace(',', ' ')
-        mat_str += str(line) + ';'
+        mat_str += '1.0 ' + str(line) + ';'
 
     mat_str = mat_str[0:len(mat_str)-1]
     test_X = np.matrix(mat_str)
 
     test_Y = None
+    test_N = 0
     mat_str = ''
     for line in test_labels:
+        test_N += 1
         line = line.replace(',', ' ')
         mat_str += str(line) + ';'
 
@@ -132,70 +144,76 @@ else:
         pickle.dump(test_X, f)
     with open('pickle/test_Y.pickle', 'w') as f:
         pickle.dump(test_Y, f)
+    with open('pickle/test_N.pickle', 'w') as f:
+        pickle.dump(test_N, f)
 
-print training_X.shape
-print training_Y.shape
-print training_N
-
-        #  w = w - (gamma * (2 * (training_X * w - training_Y).T * training_X).T / training_N)
 def train(T, gamma):
-    w = np.zeros((784,1))
-    print gamma
-    for i in range(0, T):
-        #  print (-2 / training_N) * ( (training_Y - training_X * w ).T * training_X).T
-        print w.item(0)
-        print (gamma * (-2 / training_N) * ( (training_Y - training_X * w ).T * training_X).T).item(0)
-        w -= (gamma * (-2.0/training_N) * ((training_Y - training_X * w).T * training_X).T)
+    w = np.zeros((785,1))
+    for t in range(0, T):
+        tmp = w
+        
+        h = (training_X * w - training_Y).T
+        tmp = w - gamma * (2.0/training_N) * (h * training_X).T
+        #  for j in range(0, 785):
+            #  tmp[j] = w[j] - gamma * (1.0/training_N) * h * training_X[:,j]
+
+        w = tmp
+
     return w
 
-def validate(w):
-    print (val_X * w)
-    err = np.absolute(np.sign(val_Y - np.sign(val_X * w)))
-    return np.sum(err) / err.size
+def train_err(w):
+    err = np.square(training_X * w - training_Y)
+    loss = np.sum(err) / training_N
+    return loss
 
-def test(w):
-    err = np.absolute(np.sign(test_Y - np.sign(test_X * w)))
-    return np.sum(err) / err.size
+def val_err(w):
+    err = np.square(val_X * w - val_Y)
+    loss = np.sum(err) / val_N
+    return loss
 
-w = train(10, .0001)
-print validate(w)
+def test_err(w):
+    err = np.square(test_X * w - test_Y)
+    loss = np.sum(err) / test_N
+    return loss
 
-#  print "calculating best gamma..."
-#  
-#  gamma = [.00000001, .0000001]
-#  T = 1000 
-#  
-#  best_gamma = .0001
-#  lowest_err = float("inf")
-#  
-#  for g in gamma:
-    #  w = train(T, g)
-    #  err = validate(w)
-#      
-    #  if err < lowest_err:
-        #  best_gamma = g
-        #  lowest_err = err
-#  
-#  print "calculating best T..."
-#  
+T = 1000
+eta_list = [3.5e-7, 3e-7, 1e-7, 7e-7, 1e-8, 5e-8, 1e-9, 5e-9, 1e-10, 5e-10]
+best_eta = 0 
+lowest_err = float("inf")
+
+for eta in eta_list:
+    w = train(T, eta)
+    
+    tr_err = train_err(w)
+    v_err = val_err(w)
+
+    print "eta: " + str(eta)
+    print "training error: " + str(tr_err)
+    print "validation error: " + str(v_err)
+    print
+    
+    if v_err < lowest_err:
+        best_eta = eta
+        lowest_err = v_err
+
 #  best_T = 1
 #  lowest_err = float("inf")
 #  
-#  err_plot = []
-#  for T in range(1,1001):
-    #  w = train(T, best_gamma)
-    #  err = validate(w)
+#  T_values = range(1, 1001)
+#  err_list = []
+#  for T in T_values:
+    #  print T
+#  
+    #  w = train(T, best_eta)
+    #  err = val_err(w)
 #      
-    #  err_plot.append(err)
+    #  err_list.append(err)
 #  
     #  if err < lowest_err:
         #  best_T = T
         #  lowest_err = err
 #  
-#  w = train(best_T, best_gamma)
-#  best_error = validate(w)
-#  
-#  print "best T: " + str(best_T)
-#  print "best gamma: " + str(best_gamma)
-#  print "best error: " + str(best_error)
+#  w = train(best_T, best_eta)
+w = train(1000, best_eta)
+print test_err(w)
 
