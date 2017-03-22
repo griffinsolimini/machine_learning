@@ -17,7 +17,7 @@ def gradient(X, Y, w, eta, N):
 def train(T, eta):
     w = np.zeros((785,1))
     for t in range(0, T):
-        w = gradient(training_X, training_Y, w, eta, training_N)
+        w = w - eta * (2.0 / training_N) * ((training_X * w - training_Y).T * training_X).T
 
     return w
 
