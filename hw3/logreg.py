@@ -2,7 +2,7 @@ import gradientdescent as gd
 import numpy as np
 
 def loss(X, Y, w, N):
-    return np.log(1 + np.exp(-w.T * X.T * Y)) 
+    return np.log(1 + np.exp(-w.T * X.T * Y)) / N 
 
 def gradient(X, Y, w, eta, N):
     h = float(np.exp(-w.T * X.T * Y))
