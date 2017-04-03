@@ -82,3 +82,4 @@ def run_experiment(loss, gradient, eta_values):
     plt.ylabel('Validation Error')
 
     plt.show()
+
