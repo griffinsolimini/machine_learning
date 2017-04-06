@@ -8,24 +8,35 @@ import setup as s
 
 (training_X, training_Y, training_N, val_X, val_Y, val_N, test_X, test_Y, test_N) = s.run()
 
+training_K = np.power((training_X * training_X.T + 1), 3)
+val_K = np.power((training_X * val_X.T + 1), 3)
+test_K = np.power((training_X * test_X.T + 1), 3)
+
+training_KY = training_K * training_Y
+val_KY = val_K * val_Y
+test_KY = test_K * test_Y
+
+print 'kernel matrices built'
+
 def train_increment(gradient, w, eta, l):
-    return gradient(training_X, training_Y, w, eta, l, training_N)
+    return gradient(training_K, training_KY, w, eta, l, training_N)
 
 def train(gradient, T, eta, l):
     w = np.zeros((training_N,1))
     for t in range(0, T):
+        print t
         w = train_increment(gradient, w, eta, l) 
 
     return w
 
 def train_err(loss, w, l):
-    return float(loss(training_X, training_X, training_Y, w, l, training_N))
+    return float(loss(training_K, training_KY, w, l, training_N))
 
 def val_err(loss, w, l):
-    return float(loss(training_X, val_X, val_Y, w, l, val_N))
+    return float(loss(val_K, val_KY, w, l, val_N))
 
 def test_err(loss, w, l):
-    return float(loss(training_X, test_X, test_Y, w, l, test_N))
+    return float(loss(test_K, test_KY, test_Y, w, l, test_N))
 
 def run_experiment(loss, gradient, eta_values, lambda_values):
     T = 1000
