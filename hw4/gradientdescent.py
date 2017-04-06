@@ -65,7 +65,7 @@ def run_experiment(loss, gradient, eta_values, lambda_values):
     for T in T_values:
         w = train_increment(gradient, w, best_eta, best_lambda)
         
-        err = val_err(loss, w, l)
+        err = val_err(loss, w, best_lambda)
         
         err_values.append(err)
 
@@ -79,7 +79,7 @@ def run_experiment(loss, gradient, eta_values, lambda_values):
     print "best T: " + str(best_T)
     print "best eta: " + str(best_eta)
     print "best lambda: " + str(best_lambda)
-    print "test error: " + str(test_err(loss, w, l))
+    print "test error: " + str(test_err(loss, w, best_lambda))
 
     plt.plot(T_values, err_values, '-')
 
