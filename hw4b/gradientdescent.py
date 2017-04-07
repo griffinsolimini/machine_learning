@@ -24,7 +24,6 @@ def train_increment(gradient, w, eta, l):
 def train(gradient, T, eta, l):
     w = np.zeros((training_N,1))
     for t in range(0, T):
-        print t
         w = train_increment(gradient, w, eta, l) 
 
     return w
@@ -36,10 +35,10 @@ def val_err(loss, w, l):
     return float(loss(val_K, val_KY, w, l, val_N))
 
 def test_err(loss, w, l):
-    return float(loss(test_K, test_KY, test_Y, w, l, test_N))
+    return float(loss(test_K, test_KY, w, l, test_N))
 
 def run_experiment(loss, gradient, eta_values, lambda_values):
-    T = 1000
+    T = 10
     best_combo = (0, 0) 
     lowest_err = float("inf")
     
@@ -63,7 +62,7 @@ def run_experiment(loss, gradient, eta_values, lambda_values):
     best_T = 0 
     lowest_err = float("inf")
 
-    max_T = 1000
+    max_T = 10
 
     T_values = range(1, max_T + 1)
     err_values = [] 
@@ -90,7 +89,7 @@ def run_experiment(loss, gradient, eta_values, lambda_values):
     print "best T: " + str(best_T)
     print "best eta: " + str(best_eta)
     print "best lambda: " + str(best_lambda)
-    print "test error: " + str(test_err(loss, w, best_lambda))
+    #  print "test error: " + str(test_err(loss, w, best_lambda))
 
     plt.plot(T_values, err_values, '-')
 

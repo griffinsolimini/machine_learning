@@ -6,7 +6,7 @@ def loss(K, KY, w, l, N):
     if 1 > h:
         return (1.0 / N) * (1 - h) + (l / 2) * w.T * K * w
     else:
-        return (l / 2) * w.T * K * w
+        return (l / 2) * w.T * w
 
 def gradient(K, KY, w, eta, l, N):
     h = float(w.T * KY)
@@ -18,8 +18,8 @@ def gradient(K, KY, w, eta, l, N):
 #  lambda_values = [.1, .01, .001, .0001, .00001, .000001, .0000001]
 #  eta_values = [.1, .01, .001, .0001, .00001, .000001, .0000001, .00000001]
 
-lambda_values = [.0000001]
-eta_values = [.00000001]
+lambda_values = [.00000000000000001]
+eta_values = [.00000000000000001]
 
 gd.run_experiment(loss, gradient, eta_values, lambda_values)
 
