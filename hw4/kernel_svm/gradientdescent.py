@@ -19,7 +19,7 @@ test_KY = test_K * test_Y
 print 'kernel matrices built'
 
 def train_increment(gradient, w, eta, l):
-    return gradient(training_K, training_KY, w, eta, l, training_N)
+    return gradient(training_K, training_Y, w, eta, l, training_N)
 
 def train(gradient, T, eta, l):
     w = np.zeros((training_N,1))
@@ -29,13 +29,13 @@ def train(gradient, T, eta, l):
     return w
 
 def train_err(loss, w, l):
-    return float(loss(training_K, training_KY, w, l, training_N))
+    return float(loss(training_K, training_Y, w, l, training_N))
 
 def val_err(loss, w, l):
-    return float(loss(val_K, val_KY, w, l, val_N))
+    return float(loss(val_K, val_Y, w, l, val_N))
 
 def test_err(loss, w, l):
-    return float(loss(test_K, test_KY, w, l, test_N))
+    return float(loss(test_K, test_Y, w, l, test_N))
 
 def run_experiment(loss, gradient, eta_values, lambda_values):
     T = 10
